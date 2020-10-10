@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>mc</title>
+        <meta charset="utf-8" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link rel="icon" href="assets/icon.png" />
+        <link rel="stylesheet" href="assets/style.css" />
+    </head>
+    <body>
+        <div id="header">
+            <div>
+                <button id="headerIssue" class="active" type="button">issue</button>
+            </div>
+            <div>
+                <button id="headerRetire" type="button">retire</button>
+            </div>
+        </div>
+        <div id="main">
+            <div id="message">
+                <p id="loading">loading...</p>
+                <p id="notSupported">
+                    install
+                    <a target="_blank" rel="noopener" href="https://metamask.io">metamask</a>
+                    to continue
+                </p>
+                <p id="switchNetwork">switch to the ropsten testnet</p>
+            </div>
+            <div id="issue">
+                <h1>issue carbon credits</h1>
+                <label>
+                    enter holder's address
+                    <span id="issueAddressHint" class="hint"></span>
+                    <input id="issueAddress" type="text" size="42" maxlength="42" />
+                </label>
+                <label>
+                    enter credit's serial numbers
+                    <span id="issueSerialsHint" class="hint"></span>
+                    <textarea id="issueSerials"></textarea>
+                </label>
+                <button id="issueButton" type="button">issue</button>
+                <div id="issueLog"></div>
+            </div>
+            <div id="retire">
+                <h1>retire carbon credits</h1>
+                <label>
+                    enter holder's address
+                    <span id="retireAddressHint" class="hint"></span>
+                    <input id="retireAddress" type="text" size="42" maxlength="42" />
+                </label>
+                <label>
+                    enter credit's serial numbers
+                    <span id="retireSerialsHint" class="hint"></span>
+                    <textarea id="retireSerials"></textarea>
+                </label>
+                <button id="retireButton" type="button">retire</button>
+                <div id="retireLog"></div>
+            </div>
+        </div>
+        <script src="assets/script.js"></script>
+    </body>
+</html>

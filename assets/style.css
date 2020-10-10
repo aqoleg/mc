@@ -1,0 +1,107 @@
+html, body {
+    margin: 0px;
+    padding: 0px;
+}
+div, button, input {
+    font-family: monospace;
+}
+
+#header {
+    overflow: auto;
+}
+#header div {
+    float: left;
+}
+#header button {
+    display: block;
+    margin: 22px 20px;
+    border: none;
+    padding: 10px;
+    background: none;
+    outline: 0;
+    font-size: 18px;
+    cursor: pointer;
+}
+#header button:hover {
+    color: blue;
+}
+#header button.active {
+    color: blue;
+}
+a {
+    color: black;
+}
+#main a:hover {
+    text-decoration: none;
+}
+#message {
+    height: 64px;
+    padding-top: 16px;
+    text-align: center;
+}
+#notSupported, #switchNetwork {
+    color: red;
+    display: none;
+}
+#retire {
+    display: none;
+}
+#issue, #retire {
+    width: 90%;
+    min-width: 300px;
+    max-width: 500px;
+    margin: auto;
+}
+h1 {
+    margin: 5px;
+    font-weight: normal;
+    text-align: center;
+}
+label {
+    display: block;
+    margin: 38px 5%;
+    cursor: text;
+}
+label input, textarea {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    margin-left: -10px;
+    border: 2px solid black;
+    padding: 8px;
+    background: none;
+    font-size: 16px;
+}
+label input:hover, textarea:hover {
+    border-color: blue;
+}
+label input:focus, textarea:focus {
+    border-color: blue;
+}
+textarea {
+    height: 320px;
+}
+.hint {
+    color: red;
+    font-size: 10px;
+}
+#main button {
+    display: block;
+    width: 240px;
+    height: 48px;
+    border: 2px solid black;
+    margin: auto;
+    background: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+#main button:hover {
+    border-color: blue;
+}
+#logs {
+    margin: 20px;
+}
+.onestring {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
