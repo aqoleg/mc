@@ -1,68 +1,64 @@
+/* color: blue */
+
 html, body {
     margin: 0px;
     padding: 0px;
 }
-div, button, input {
+div, button, input, textarea {
     font-family: monospace;
-}
-
-#header {
-    overflow: auto;
-}
-#header div {
-    float: left;
-}
-#header button {
-    display: block;
-    margin: 22px 20px;
-    border: none;
-    padding: 10px;
-    background: none;
-    outline: 0;
-    font-size: 18px;
-    cursor: pointer;
-}
-#header button:hover {
-    color: blue;
-}
-#header button.active {
-    color: blue;
 }
 a {
     color: black;
 }
-#main a:hover {
-    text-decoration: none;
+h1, h2 {
+    margin: 5px;
+    font-weight: normal;
+    text-align: center;
+}
+textarea {
+    height: 320px;
+}
+button {
+    display: block;
+    width: 200px;
+    height: 48px;
+    border: 2px solid black;
+    margin: auto;
+    background: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#noFooter {
+    min-height: calc(100vh - 80px); /* footer heigth */
 }
 #message {
     height: 64px;
     padding-top: 16px;
     text-align: center;
 }
-#notSupported, #switchNetwork {
-    color: red;
+#install, #network, #connect, #user, #operator {
     display: none;
 }
-#retire {
-    display: none;
+#tokens {
+    margin-bottom: 40px;
 }
-#issue, #retire {
-    width: 90%;
-    min-width: 300px;
-    max-width: 500px;
-    margin: auto;
-}
-h1 {
-    margin: 5px;
-    font-weight: normal;
+.credits {
+    margin-bottom: 64px;
     text-align: center;
 }
-label {
+.label {
     display: block;
-    margin: 38px 5%;
+    width: 90%;
+    max-width: 700px;
+    margin: 32px auto;
     cursor: text;
 }
-label input, textarea {
+.hint {
+    color: red;
+    font-size: 10px;
+}
+.label input, textarea {
     display: block;
     width: 100%;
     margin-top: 8px;
@@ -72,36 +68,66 @@ label input, textarea {
     background: none;
     font-size: 16px;
 }
-label input:hover, textarea:hover {
-    border-color: blue;
-}
-label input:focus, textarea:focus {
-    border-color: blue;
-}
-textarea {
-    height: 320px;
-}
-.hint {
-    color: red;
-    font-size: 10px;
-}
-#main button {
+.checkbox {
     display: block;
-    width: 240px;
-    height: 48px;
-    border: 2px solid black;
-    margin: auto;
-    background: none;
-    font-size: 18px;
+    width: 200px;
+    margin: 32px auto;
+    line-height: 32px;
     cursor: pointer;
 }
-#main button:hover {
-    border-color: blue;
+.checkbox input {
+    display: none;
 }
-#logs {
-    margin: 20px;
+.box {
+    float: left;
+    width: 28px;
+    height: 28px;
+    border: 2px solid black;
+}
+.box div {
+    background: red;
+    width: 24px;
+    height: 24px;
+    margin: 2px;
+    background: white;
+}
+.checkbox span {
+    padding-left: 10px;
+}
+.checkbox input:checked ~ .box div {
+    background: blue;
+}
+#userLog, #operatorLog {
+    width: 90%;
+    margin: 32px auto 0px;
+    padding-bottom: 32px;
+}
+#footer {
+    height: 80px;
+}
+#footer a {
+    float: right;
+    margin-top: 24px;
+    margin-right: 5%;
+    padding: 4px;
+    font-size: 16px;
 }
 .onestring {
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+@media (hover: hover) {
+    a:hover {
+        text-decoration: none;
+    }
+    input:hover, input:focus, textarea:hover, textarea:focus {
+        border-color: blue;
+    }
+    button:hover {
+        border-color: blue;
+    }
+    .checkbox input:hover ~ .box {
+        border-color: blue;
+    }
 }

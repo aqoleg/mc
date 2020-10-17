@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfile="full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+    <path d="
+             M 21.715728,78.284
+             A 40,40 0 1 1 50,90
+             C 70,60 50,30 72,34
+             C 30,20 20,50 21.715728,78.284
+             z
+             " fill="blue" />
+</svg>

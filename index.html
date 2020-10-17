@@ -10,55 +10,62 @@
         <link rel="stylesheet" href="assets/style.css" />
     </head>
     <body>
-        <div id="header">
-            <div>
-                <button id="headerIssue" class="active" type="button">issue</button>
-            </div>
-            <div>
-                <button id="headerRetire" type="button">retire</button>
-            </div>
-        </div>
-        <div id="main">
+        <div id="noFooter">
             <div id="message">
                 <p id="loading">loading...</p>
-                <p id="notSupported">
+                <p id="install">
                     install
                     <a target="_blank" rel="noopener" href="https://metamask.io">metamask</a>
-                    to continue
                 </p>
-                <p id="switchNetwork">switch to the ropsten testnet</p>
+                <p id="network">switch to the ropsten network</p>
+                <button id="connect" type="button">connect</button>
             </div>
-            <div id="issue">
-                <h1>issue carbon credits</h1>
-                <label>
-                    enter holder's address
-                    <span id="issueAddressHint" class="hint"></span>
-                    <input id="issueAddress" type="text" size="42" maxlength="42" />
+            <div id="user">
+                <h1>M+C tokens:</h1>
+                <h2 id="tokens">...</h2>
+                <h1>retired carbon credits:</h1>
+                <h2>
+                    <span id="claimed">...</span>
+                    /
+                    <span id="retired">...</span>
+                </h2>
+                <p class="credits">(converted to tokens / total)</p>
+                <label class="label">
+                    enter address
+                    <span id="claimAddressHint" class="hint"></span>
+                    <input id="claimAddress" type="text" size="42" maxlength="42" />
                 </label>
-                <label>
-                    enter credit's serial numbers
-                    <span id="issueSerialsHint" class="hint"></span>
-                    <textarea id="issueSerials"></textarea>
-                </label>
-                <button id="issueButton" type="button">issue</button>
-                <div id="issueLog"></div>
+                <button id="claim" type="button">claim</button>
+                <div id="userLog"></div>
             </div>
-            <div id="retire">
+            <div id="operator">
                 <h1>retire carbon credits</h1>
-                <label>
-                    enter holder's address
+                <label class="label">
+                    enter serial numbers of retired credits
+                    <span id="serialsHint" class="hint"></span>
+                    <textarea id="serials"></textarea>
+                </label>
+                <label class="label">
+                    enter address
                     <span id="retireAddressHint" class="hint"></span>
                     <input id="retireAddress" type="text" size="42" maxlength="42" />
                 </label>
-                <label>
-                    enter credit's serial numbers
-                    <span id="retireSerialsHint" class="hint"></span>
-                    <textarea id="retireSerials"></textarea>
+                <label class="checkbox">
+                    <input id="retireAndSend" type="checkbox" />
+                    <div class="box">
+                        <div></div>
+                    </div>
+                    <span>issue tokens</span>
                 </label>
-                <button id="retireButton" type="button">retire</button>
-                <div id="retireLog"></div>
+                <button id="retire" type="button">retire</button>
+                <div id="operatorLog"></div>
             </div>
         </div>
+        <div id="footer">
+            <a id="contract" target="_blank" rel="noopener" href="https://ropsten.etherscan.io">etherscan</a>
+            <a target="_blank" rel="noopener" href="https://github.com/aqoleg/mc">github</a>
+        </div>
+        <script src="assets/bignumber.min.js"></script>
         <script src="assets/script.js"></script>
     </body>
 </html>
