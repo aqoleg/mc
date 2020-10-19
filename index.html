@@ -24,37 +24,35 @@
                 <h1>M+C tokens:</h1>
                 <h2 id="tokens">...</h2>
                 <h1>retired carbon credits:</h1>
-                <h2>
-                    <span id="claimed">...</span>
-                    /
-                    <span id="retired">...</span>
-                </h2>
+                <h2><span id="claimed">...</span> / <span id="retired">...</span></h2>
                 <p class="credits">(converted to tokens / total)</p>
                 <label class="label">
                     enter address
                     <span id="claimAddressHint" class="hint"></span>
-                    <input id="claimAddress" type="text" size="42" maxlength="42" />
+                    <input id="claimAddress" class="input" type="text" size="42" maxlength="42" />
                 </label>
                 <button id="claim" type="button">claim</button>
                 <div id="userLog"></div>
             </div>
             <div id="operator">
                 <h1>retire carbon credits</h1>
+                <input id="file" type="file" />
                 <label class="label">
-                    enter serial numbers of retired credits
+                    enter or
+                    <label for="file" id="open">open</label>
+                    serial numbers
+                    <span id="reading">- reading...</span>
                     <span id="serialsHint" class="hint"></span>
-                    <textarea id="serials"></textarea>
+                    <textarea id="serials" class="input"></textarea>
                 </label>
                 <label class="label">
                     enter address
                     <span id="retireAddressHint" class="hint"></span>
-                    <input id="retireAddress" type="text" size="42" maxlength="42" />
+                    <input id="retireAddress" class="input" type="text" size="42" maxlength="42" />
                 </label>
                 <label class="checkbox">
                     <input id="retireAndSend" type="checkbox" />
-                    <div class="box">
-                        <div></div>
-                    </div>
+                    <div class="box"><div></div></div>
                     <span>issue tokens</span>
                 </label>
                 <button id="retire" type="button">retire</button>
@@ -62,8 +60,9 @@
             </div>
         </div>
         <div id="footer">
-            <a id="contract" target="_blank" rel="noopener" href="https://ropsten.etherscan.io">etherscan</a>
+            <a target="_blank" rel="noopener" href="https://gitcoin.co/issue/MPlus4Climate/MPlusToolKit/1/100023834">gitcoin</a>
             <a target="_blank" rel="noopener" href="https://github.com/aqoleg/mc">github</a>
+            <a id="contract" target="_blank" rel="noopener" href="https://ropsten.etherscan.io">etherscan</a>
         </div>
         <script src="assets/bignumber.min.js"></script>
         <script src="assets/script.js"></script>

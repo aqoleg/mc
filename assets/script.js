@@ -4,6 +4,19 @@
     var contractAddress = '0xe0660bF997A5a2f18561Bd6a60412195359Be943';
     var abi = [
         {
+            "inputs": [],
+            "name": "operator",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
             "inputs": [
                 {
                     "internalType": "address",
@@ -11,7 +24,7 @@
                     "type": "address"
                 }
             ],
-            "name": "balanceOf",
+            "name": "credits",
             "outputs": [
                 {
                     "internalType": "uint256",
@@ -26,19 +39,19 @@
             "inputs": [
                 {
                     "internalType": "address",
-                    "name": "_to",
+                    "name": "",
                     "type": "address"
                 }
             ],
-            "name": "claim",
+            "name": "unclaimedCredits",
             "outputs": [
                 {
                     "internalType": "uint256",
-                    "name": "_value",
+                    "name": "",
                     "type": "uint256"
                 }
             ],
-            "stateMutability": "nonpayable",
+            "stateMutability": "view",
             "type": "function"
         },
         {
@@ -49,7 +62,7 @@
                     "type": "address"
                 }
             ],
-            "name": "credits",
+            "name": "balanceOf",
             "outputs": [
                 {
                     "internalType": "uint256",
@@ -109,35 +122,22 @@
             "type": "function"
         },
         {
-            "inputs": [],
-            "name": "operator",
-            "outputs": [
-                {
-                    "internalType": "address",
-                    "name": "",
-                    "type": "address"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
             "inputs": [
                 {
                     "internalType": "address",
-                    "name": "",
+                    "name": "_to",
                     "type": "address"
                 }
             ],
-            "name": "unclaimedCredits",
+            "name": "claim",
             "outputs": [
                 {
                     "internalType": "uint256",
-                    "name": "",
+                    "name": "_value",
                     "type": "uint256"
                 }
             ],
-            "stateMutability": "view",
+            "stateMutability": "nonpayable",
             "type": "function"
         },
         {
@@ -177,12 +177,38 @@
             ],
             "name": "RetireAndSend",
             "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "_holder",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "address",
+                    "name": "_to",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "_value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "Claim",
+            "type": "event"
         }
     ];
 
     var contract = null; // null if network is not ropsten
-    var account = null; // checksum address or null
-    var operator; // checksum address
+    var account = null; // checksummed address or null
+    var operator; // checksummed address
+    var blocked = false;
 
     window.onload = function () {
         document.getElementById('contract').href = 'https://ropsten.etherscan.io/address/' +
@@ -207,6 +233,29 @@
             }
         };
         document.body.appendChild(script);
+
+        document.getElementById('file').onchange = function (event) {
+            read(event.target.files);
+        };
+
+        document.getElementById('serials').ondragenter = function (event) {
+            document.getElementById('serials').style.borderColor = 'blue';
+            event.stopPropagation();
+            event.preventDefault();
+        };
+        document.getElementById('serials').ondragover = function (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        };
+        document.getElementById('serials').ondragleave = function () {
+            document.getElementById('serials').style.borderColor = 'black';
+        };
+        document.getElementById('serials').ondrop = function (event) {
+            document.getElementById('serials').style.borderColor = 'black';
+            event.stopPropagation();
+            event.preventDefault();
+            read(event.dataTransfer.files);
+        };
     };
 
     function load() {
@@ -225,17 +274,17 @@
                 document.getElementById('loading').style.display = 'block';
                 contract = new web3.eth.Contract(abi, contractAddress);
                 contract.events.allEvents().on('data', function () {
-                    if (account !== null && account !== operator) {
-                        loadAccount();
+                    if (contract !== null && account !== null && account !== operator) {
+                        loadAccount(false);
                     }
                 });
                 contract.methods.operator().call().then(function (result) {
                     operator = web3.utils.toChecksumAddress(result);
                     document.getElementById('loading').style.display = 'none';
-                    load1();
+                    loadAccounts();
                 });
             } else {
-                load1();
+                loadAccounts();
             }
         }).catch(function (error) {
             console.error(error);
@@ -245,7 +294,7 @@
             alert(error);
         });
 
-        function load1() {
+        function loadAccounts() {
             ethereum.request({
                 method: 'eth_accounts'
             }).then(function (accounts) {
@@ -254,8 +303,12 @@
                     document.getElementById('connect').style.display = 'block';
                     document.getElementById('user').style.display = 'none';
                     document.getElementById('operator').style.display = 'none';
-                } else if (accounts[0] !== account) {
-                    account = web3.utils.toChecksumAddress(accounts[0]);
+                } else {
+                    var newAccount = web3.utils.toChecksumAddress(accounts[0]);
+                    if (newAccount === account) {
+                        return;
+                    }
+                    account = newAccount;
                     document.getElementById('connect').style.display = 'none';
                     if (account === operator) {
                         document.getElementById('user').style.display = 'none';
@@ -264,14 +317,20 @@
                         document.getElementById('claimAddress').value = account;
                         document.getElementById('user').style.display = 'block';
                         document.getElementById('operator').style.display = 'none';
-                        loadAccount();
+                        loadAccount(true);
                     }
                 }
             });
         }
     }
 
-    function loadAccount() {
+    function loadAccount(clear) {
+        if (clear) {
+            document.getElementById('tokens').innerHTML = '...';
+            document.getElementById('retired').innerHTML = '...';
+            document.getElementById('claimed').innerHTML = '...';
+        }
+
         contract.methods.balanceOf(account).call().then(function (result) {
             result = new BigNumber(result).shiftedBy(-18);
             if (result.isZero()) {
@@ -306,9 +365,15 @@
     }
 
     function claim() {
+        if (blocked) {
+            alert('confirm or reject previous tx');
+            return;
+        }
+        blocked = true;
         var address = document.getElementById('claimAddress').value;
         if (!web3.utils.isAddress(address)) {
-            document.getElementById('claimAddressHint').innerHTML = 'enter valid address';
+            document.getElementById('claimAddressHint').innerHTML = 'address is incorrect';
+            blocked = false;
             return;
         }
         document.getElementById('claimAddressHint').innerHTML = '';
@@ -318,19 +383,16 @@
             from: account
         }).on('transactionHash', function (hash) {
             message = printLog(document.getElementById('userLog'), hash);
+            blocked = false;
         }).on('confirmation', function (confirmationNumber, receipt) {
-            if (confirmationNumber == 0) {
-                if (!receipt.status) {
-                    message.innerHTML = ', rejected';
-                } else {
-                    var msg = ', retired ';
-                    if (receipt.events.Claim) {
-                        msg += receipt.events.Claim.returnValues._value;
-                    } else {
-                        msg += '0';
-                    }
-                    message.innerHTML = msg + ' carbon credits';
-                }
+            if (confirmationNumber != 0) {
+                return;
+            }
+            if (!receipt.status) {
+                message.innerHTML = ' - rejected';
+            } else {
+                message.innerHTML = ' - sent tokens for ' +
+                    receipt.events.Claim.returnValues._value + ' carbon credits';
             }
         }).catch(function (error) {
             console.error(error);
@@ -338,20 +400,28 @@
                 error = error.message;
             }
             alert(error);
+            blocked = false;
         });
     }
 
     function retire() {
+        if (blocked) {
+            alert('confirm or reject previous tx');
+            return;
+        }
+        blocked = true;
         var serials = parseSerials(
             document.getElementById('serials').value,
             document.getElementById('serialsHint')
         );
         if (!serials) {
+            blocked = false;
             return;
         }
         var address = document.getElementById('retireAddress').value;
         if (!web3.utils.isAddress(address)) {
-            document.getElementById('retireAddressHint').innerHTML = 'enter valid address';
+            document.getElementById('retireAddressHint').innerHTML = 'address is incorrect';
+            blocked = false;
             return;
         }
         document.getElementById('retireAddressHint').innerHTML = '';
@@ -362,19 +432,16 @@
                 from: account
             }).on('transactionHash', function (hash) {
                 message = printLog(document.getElementById('operatorLog'), hash);
+                blocked = false;
             }).on('confirmation', function (confirmationNumber, receipt) {
-                if (confirmationNumber == 0) {
-                    if (!receipt.status) {
-                        message.innerHTML = ', rejected';
-                    } else {
-                        var msg = ', retired and sent ';
-                        if (receipt.events.RetireAndSend) {
-                            msg += receipt.events.RetireAndSend.returnValues._value;
-                        } else {
-                            msg += '0';
-                        }
-                        message.innerHTML = msg + ' carbon credits';
-                    }
+                if (confirmationNumber != 0) {
+                    return;
+                }
+                if (!receipt.status) {
+                    message.innerHTML = ' - rejected';
+                } else {
+                    message.innerHTML = ' - sent tokens for ' +
+                        receipt.events.RetireAndSend.returnValues._value + ' carbon credits';
                 }
             }).catch(function (error) {
                 console.error(error);
@@ -382,25 +449,23 @@
                     error = error.message;
                 }
                 alert(error);
+                blocked = false;
             });
         } else {
             contract.methods.retire(address, serials).send({
                 from: account
             }).on('transactionHash', function (hash) {
                 message = printLog(document.getElementById('operatorLog'), hash);
+                blocked = false;
             }).on('confirmation', function (confirmationNumber, receipt) {
-                if (confirmationNumber == 0) {
-                    if (!receipt.status) {
-                        message.innerHTML = ', rejected';
-                    } else {
-                        var msg = ', retired ';
-                        if (receipt.events.Retire) {
-                            msg += receipt.events.Retire.returnValues._value;
-                        } else {
-                            msg += '0';
-                        }
-                        message.innerHTML = msg + ' carbon credits';
-                    }
+                if (confirmationNumber != 0) {
+                    return;
+                }
+                if (!receipt.status) {
+                    message.innerHTML = ' - rejected';
+                } else {
+                    message.innerHTML = ' - retired ' +
+                        receipt.events.Retire.returnValues._value + ' carbon credits';
                 }
             }).catch(function (error) {
                 console.error(error);
@@ -408,27 +473,52 @@
                     error = error.message;
                 }
                 alert(error);
+                blocked = false;
             });
         }
+    }
+
+    function read(files) {
+        var reader = new FileReader();
+        reader.onload = function (event) {
+            document.getElementById('serials').innerHTML = event.target.result;
+            document.getElementById('reading').style.display = 'none';
+        };
+        reader.onerror = function () {
+            document.getElementById('reading').style.display = 'none';
+            document.getElementById('serialsHint').innerHTML = 'cannot read file';
+        };
+        document.getElementById('reading').style.display = 'inline';
+        document.getElementById('serialsHint').innerHTML = '';
+        reader.readAsText(files[0]);
     }
 
     function parseSerials(text, hint) {
         var serials = [];
         var startIndex = 0;
-        for (var i = 0; i < text.length; i++) {
-            if (text.charAt(i) < '0') {
-                if (startIndex < i) {
-                    serials.push(text.substring(startIndex, i));
+        var length = text.length;
+        var char;
+        for (var i = 0; i < length; i++) {
+            char = text.charAt(i);
+            if (char >= '0') {
+                if (char <= '9') {
+                    continue;
+                } else if (char !== ']' && char !== '[') {
+                    hint.innerHTML = 'incorrect number ' + text.substring(startIndex, i + 1);
+                    return false;
                 }
-                startIndex = i + 1;
             }
+            if (startIndex < i) {
+                serials.push(text.substring(startIndex, i));
+            }
+            startIndex = i + 1;
         }
         if (startIndex < text.length) {
             serials.push(text.substring(startIndex));
         }
 
         if (serials.length === 0) {
-            hint.innerHTML = 'enter serial numbers';
+            hint.innerHTML = 'no serial numbers';
             return false;
         }
         hint.innerHTML = '';
@@ -438,14 +528,17 @@
     function printLog(div, hash) {
         var p = document.createElement('p');
         p.classList.add('onestring');
+        var span = document.createElement('span');
+        span.innerHTML = 'tx ';
+        p.appendChild(span);
         var a = document.createElement('a');
         a.innerHTML = hash;
         a.href = 'https://ropsten.etherscan.io/tx/' + hash;
         a.setAttribute('target', '_blank');
         a.setAttribute('rel', 'noopener');
         p.appendChild(a);
-        var span = document.createElement('span');
-        span.innerHTML = ', waiting for confirmation...';
+        span = document.createElement('span');
+        span.innerHTML = ' - unconfirmed';
         p.appendChild(span);
         div.insertBefore(p, div.firstChild);
         return span;
