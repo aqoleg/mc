@@ -244,13 +244,14 @@
         };
         document.getElementById('serials').ondragover = function (event) {
             event.preventDefault();
+            document.getElementById('serials').style.borderColor = 'blue';
         };
         document.getElementById('serials').ondragleave = function () {
-            document.getElementById('serials').style.borderColor = 'black';
+            document.getElementById('serials').style.borderColor = '';
         };
         document.getElementById('serials').ondrop = function (event) {
             event.preventDefault();
-            document.getElementById('serials').style.borderColor = 'black';
+            document.getElementById('serials').style.borderColor = '';
             read(event.dataTransfer.files);
         };
     };
