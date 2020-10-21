@@ -483,7 +483,7 @@
         var reader = new FileReader();
         reader.onload = function (event) {
             document.getElementById('reading').style.display = 'none';
-            document.getElementById('serials').innerHTML = event.target.result;
+            document.getElementById('serials').value = event.target.result;
         };
         reader.onerror = function (event) {
             console.error(event);
@@ -522,7 +522,11 @@
         }
 
         if (serials.length === 0) {
-            hint.innerHTML = 'no serial numbers';
+            hint.innerHTML = 'enter at least one number';
+            return false;
+        }
+        if (serials.length > 350) {
+            hint.innerHTML = 'enter no more than 350 numbers';
             return false;
         }
         hint.innerHTML = '';
