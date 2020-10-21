@@ -1,3 +1,9 @@
+/*
+https://gitcoin.co/issue/MPlus4Climate/MPlusToolKit/1/100023834
+https://github.com/aqoleg
+*/
+
+
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.7.3;
 
@@ -38,7 +44,7 @@ library Math {
 }
 
 
-/// @title https://gitcoin.co/issue/MPlus4Climate/MPlusToolKit/1/100023834
+/// @title M+Climate
 /// @author aqoleg
 contract Mc {
     using Math for uint256;
@@ -58,8 +64,8 @@ contract Mc {
     /// @return total number of all retired carbon credits
     uint256 public totalCredits;
 
-    /// @return true if carbon credit with this serial number is retired
-    mapping(uint256 => bool) public serialNumbers;
+    /// @return address that retired the carbon credit with this serial number
+    mapping(uint256 => address) public serialNumbers;
 
     /// @return number of all retired carbon credits for each account
     mapping(address => uint256) public credits;
@@ -76,9 +82,10 @@ contract Mc {
     /// @return number of tokens for each account
     mapping(address => uint256) public balanceOf;
 
+    /// @notice [holder][spender]
     /// @dev erc20
     /// @return number of tokens allowed for transfer using transferFrom() function
-    mapping(address => mapping(address => uint256)) public allowance; // [holder][spender]
+    mapping(address => mapping(address => uint256)) public allowance;
 
     /// @dev erc20
     /// @return number of decimals in the token
@@ -103,16 +110,13 @@ contract Mc {
     event FundBasePoints(uint16 _fundBasePoints);
 
     /// @notice emits when new carbon credits are retired and no tokens are issued
-    /// @param _value number of retired carbon credits
-    event Retire(address indexed _holder, uint256 _value);
+    event Retire(address indexed _holder, uint256 _credits);
 
     /// @notice emits when new carbon credits are retired and tokens are issued and sent
-    /// @param _value number of retired carbon credits
-    event RetireAndSend(address indexed _holder, uint256 _value);
+    event RetireAndSend(address indexed _holder, uint256 _credits);
 
     /// @notice emits when tokens for retired and unclaimed carbon credits are requested
-    /// @param _value number of retired carbon credits
-    event Claim(address indexed _holder, address _to, uint256 _value);
+    event Claim(address indexed _holder, address _to, uint256 _credits);
 
     /// @notice emits when tokens are transferred
     /// @dev erc20
@@ -175,46 +179,46 @@ contract Mc {
     /// @notice allows the operator to retire carbon credits without issuing new tokens
     /// @param _holder non-zero address that can claim tokens for these retired carbon credits
     /// @param _serialNumbers serial numbers of retired carbon credits
-    /// @return _value number of carbon credits actually retired (without duplicates)
+    /// @return _credits number of carbon credits actually retired (without duplicates)
     function retire(address _holder, uint256[] calldata _serialNumbers)
         public
         notZero(_holder)
         onlyOperator
-        returns (uint256 _value)
+        returns (uint256 _credits)
     {
-        _value = _checkSerialNumbers(_serialNumbers);
-        totalCredits = totalCredits.add(_value);
-        credits[_holder] = credits[_holder].add(_value);
-        unclaimedCredits[_holder] = unclaimedCredits[_holder].add(_value);
-        emit Retire(_holder, _value);
+        _credits = _checkSerialNumbers(_holder, _serialNumbers);
+        totalCredits = totalCredits.add(_credits);
+        credits[_holder] = credits[_holder].add(_credits);
+        unclaimedCredits[_holder] = unclaimedCredits[_holder].add(_credits);
+        emit Retire(_holder, _credits);
     }
 
     /// @notice allows the operator to retire carbon credits, issue new tokens and send them
     /// @param _holder non-zero address that receives tokens
     /// @param _serialNumbers serial numbers of retired carbon credits
-    /// @return _value number of carbon credits actually retired (without duplicates)
+    /// @return _credits number of carbon credits actually retired (without duplicates)
     function retireAndSend(address _holder, uint256[] calldata _serialNumbers)
         public
         notZero(_holder)
         onlyOperator
-        returns (uint256 _value)
+        returns (uint256 _credits)
     {
-        _value = _checkSerialNumbers(_serialNumbers);
-        totalCredits = totalCredits.add(_value);
-        credits[_holder] = credits[_holder].add(_value);
-        emit RetireAndSend(_holder, _value);
-        _mint(_holder, _value);
+        _credits = _checkSerialNumbers(_holder, _serialNumbers);
+        totalCredits = totalCredits.add(_credits);
+        credits[_holder] = credits[_holder].add(_credits);
+        emit RetireAndSend(_holder, _credits);
+        _mint(_holder, _credits);
     }
 
     /// @notice issues tokens for sender's unclaimed carbon credits
     /// @param _to non-zero address that recieves tokens
-    /// @return _value number of carbon credits for which tokens were created
-    function claim(address _to) public notZero(_to) returns (uint256 _value) {
+    /// @return _credits number of carbon credits for which tokens were created
+    function claim(address _to) public notZero(_to) returns (uint256 _credits) {
         address holder = msg.sender;
-        _value = unclaimedCredits[holder];
+        _credits = unclaimedCredits[holder];
         unclaimedCredits[holder] = 0;
-        emit Claim(holder, _to, _value);
-        _mint(_to, _value);
+        emit Claim(holder, _to, _credits);
+        _mint(_to, _credits);
     }
 
     /// @notice transfers tokens
@@ -239,13 +243,16 @@ contract Mc {
     }
 
     // avoids using the same credit twice, returns the number of unique serial numbers
-    function _checkSerialNumbers(uint256[] calldata _serialNumbers) private returns (uint256 _value) {
-        _value = _serialNumbers.length;
+    function _checkSerialNumbers(address _holder, uint256[] calldata _serialNumbers)
+        private
+        returns (uint256 _credits)
+    {
+        _credits = _serialNumbers.length;
         for (uint256 i = 0; i < _serialNumbers.length; i++) {
-            if (serialNumbers[_serialNumbers[i]]) {
-                _value = _value.sub(1);
+            if (serialNumbers[_serialNumbers[i]] != address(0)) {
+                _credits = _credits.sub(1);
             } else {
-                serialNumbers[_serialNumbers[i]] = true;
+                serialNumbers[_serialNumbers[i]] = _holder;
             }
         }
     }
@@ -265,7 +272,11 @@ contract Mc {
     }
 
     // transfers tokens
-    function _transfer(address _from, address _to, uint256 _value) private notZero(_to) returns (bool) {
+    function _transfer(address _from, address _to, uint256 _value)
+        private
+        notZero(_to)
+        returns (bool)
+    {
         balanceOf[_from] = balanceOf[_from].sub(_value);
         balanceOf[_to] = balanceOf[_to].add(_value);
         emit Transfer(_from, _to, _value);

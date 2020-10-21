@@ -1,7 +1,7 @@
 "use strict";
 
 (function () {
-    var contractAddress = '0xe0660bF997A5a2f18561Bd6a60412195359Be943';
+    var contractAddress = '0x8EC307125F5915dAb1e18E2205A055b339d0DcAB';
     var abi = [
         {
             "inputs": [],
@@ -90,7 +90,7 @@
             "outputs": [
                 {
                     "internalType": "uint256",
-                    "name": "_value",
+                    "name": "_credits",
                     "type": "uint256"
                 }
             ],
@@ -114,7 +114,7 @@
             "outputs": [
                 {
                     "internalType": "uint256",
-                    "name": "_value",
+                    "name": "_credits",
                     "type": "uint256"
                 }
             ],
@@ -133,7 +133,7 @@
             "outputs": [
                 {
                     "internalType": "uint256",
-                    "name": "_value",
+                    "name": "_credits",
                     "type": "uint256"
                 }
             ],
@@ -152,7 +152,7 @@
                 {
                     "indexed": false,
                     "internalType": "uint256",
-                    "name": "_value",
+                    "name": "_credits",
                     "type": "uint256"
                 }
             ],
@@ -171,7 +171,7 @@
                 {
                     "indexed": false,
                     "internalType": "uint256",
-                    "name": "_value",
+                    "name": "_credits",
                     "type": "uint256"
                 }
             ],
@@ -196,7 +196,7 @@
                 {
                     "indexed": false,
                     "internalType": "uint256",
-                    "name": "_value",
+                    "name": "_credits",
                     "type": "uint256"
                 }
             ],
@@ -208,7 +208,7 @@
     var contract = null; // null if network is not ropsten
     var account = null; // checksummed address or null
     var operator; // checksummed address
-    var blocked = false;
+    var blocked = false; // true if current operation is unfinished
 
     window.onload = function () {
         document.getElementById('contract').href = 'https://ropsten.etherscan.io/address/' +
@@ -238,22 +238,15 @@
             read(event.target.files);
         };
 
-        document.getElementById('serials').ondragenter = function (event) {
+        document.getElementById('serials').ondragenter = function () {
             document.getElementById('serials').style.borderColor = 'blue';
-            event.stopPropagation();
-            event.preventDefault();
-        };
-        document.getElementById('serials').ondragover = function (event) {
-            event.stopPropagation();
-            event.preventDefault();
         };
         document.getElementById('serials').ondragleave = function () {
             document.getElementById('serials').style.borderColor = 'black';
         };
         document.getElementById('serials').ondrop = function (event) {
-            document.getElementById('serials').style.borderColor = 'black';
-            event.stopPropagation();
             event.preventDefault();
+            document.getElementById('serials').style.borderColor = 'black';
             read(event.dataTransfer.files);
         };
     };
@@ -392,7 +385,7 @@
                 message.innerHTML = ' - rejected';
             } else {
                 message.innerHTML = ' - sent tokens for ' +
-                    receipt.events.Claim.returnValues._value + ' carbon credits';
+                    receipt.events.Claim.returnValues._credits + ' carbon credits';
             }
         }).catch(function (error) {
             console.error(error);
@@ -441,7 +434,7 @@
                     message.innerHTML = ' - rejected';
                 } else {
                     message.innerHTML = ' - sent tokens for ' +
-                        receipt.events.RetireAndSend.returnValues._value + ' carbon credits';
+                        receipt.events.RetireAndSend.returnValues._credits + ' carbon credits';
                 }
             }).catch(function (error) {
                 console.error(error);
@@ -465,7 +458,7 @@
                     message.innerHTML = ' - rejected';
                 } else {
                     message.innerHTML = ' - retired ' +
-                        receipt.events.Retire.returnValues._value + ' carbon credits';
+                        receipt.events.Retire.returnValues._credits + ' carbon credits';
                 }
             }).catch(function (error) {
                 console.error(error);
@@ -479,17 +472,25 @@
     }
 
     function read(files) {
+        document.getElementById('serialsHint').innerHTML = '';
+        if (files.length === 0) {
+            return;
+        }
+        document.getElementById('reading').style.display = 'inline';
         var reader = new FileReader();
         reader.onload = function (event) {
+            document.getElementById('reading').style.display = 'none';
             document.getElementById('serials').innerHTML = event.target.result;
-            document.getElementById('reading').style.display = 'none';
         };
-        reader.onerror = function () {
+        reader.onerror = function (event) {
+            console.error(event);
             document.getElementById('reading').style.display = 'none';
-            document.getElementById('serialsHint').innerHTML = 'cannot read file';
+            if (event.target.error && event.target.error.message) {
+                document.getElementById('serialsHint').innerHTML = event.target.error.message;
+            } else {
+                document.getElementById('serialsHint').innerHTML = 'cannot read the file';
+            }
         };
-        document.getElementById('reading').style.display = 'inline';
-        document.getElementById('serialsHint').innerHTML = '';
         reader.readAsText(files[0]);
     }
 
@@ -504,7 +505,7 @@
                 if (char <= '9') {
                     continue;
                 } else if (char !== ']' && char !== '[') {
-                    hint.innerHTML = 'incorrect number ' + text.substring(startIndex, i + 1);
+                    hint.innerHTML = 'incorrect number "' + text.substring(startIndex, i + 1) + '"';
                     return false;
                 }
             }

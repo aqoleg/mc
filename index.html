@@ -3,6 +3,7 @@
     <head>
         <title>mc</title>
         <meta charset="utf-8" />
+        <meta name="description" content="M+Climate token" />
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -39,11 +40,11 @@
                 <input id="file" type="file" />
                 <label class="label">
                     enter or
-                    <label for="file" id="open">open</label>
+                    <a id="open" href="javascript:document.getElementById('file').click();">open</a>
                     serial numbers
                     <span id="reading">- reading...</span>
                     <span id="serialsHint" class="hint"></span>
-                    <textarea id="serials" class="input"></textarea>
+                    <textarea id="serials" class="input" placeholder="Enter serial numbers separated by a new line, space, or comma. Or choose a file and drag it here."></textarea>
                 </label>
                 <label class="label">
                     enter address
@@ -52,8 +53,8 @@
                 </label>
                 <label class="checkbox">
                     <input id="retireAndSend" type="checkbox" />
-                    <div class="box"><div></div></div>
-                    <span>issue tokens</span>
+                    <span class="box"><span></span></span>
+                    <span class="checkboxHint">issue tokens</span>
                 </label>
                 <button id="retire" type="button">retire</button>
                 <div id="operatorLog"></div>

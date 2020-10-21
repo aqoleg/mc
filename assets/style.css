@@ -69,12 +69,11 @@ button {
     background: none;
     font-size: 16px;
 }
+.input:focus, textarea:focus {
+    border-color: blue;
+}
 #file {
     display: none;
-}
-#open {
-    text-decoration: underline;
-    cursor: pointer;
 }
 .checkbox {
     display: block;
@@ -87,21 +86,23 @@ button {
     display: none;
 }
 .box {
+    display: block;
     float: left;
     width: 28px;
     height: 28px;
     border: 2px solid black;
 }
-.box div {
+.box span {
+    display: block;
     width: 24px;
     height: 24px;
     margin: 2px;
     background: white;
 }
-.checkbox span {
+.checkboxHint {
     padding-left: 10px;
 }
-.checkbox input:checked ~ .box div {
+.checkbox input:checked ~ .box span {
     background: blue;
 }
 #userLog, #operatorLog {
@@ -125,10 +126,13 @@ button {
 }
 
 @media (hover: hover) {
-    a:hover, #open:hover {
+    a:hover {
         color: blue;
     }
-    .input:hover, .input:focus, textarea:hover, textarea:focus {
+    #open:hover ~ textarea {
+        border-color: black;
+    }
+    .input:hover, textarea:hover {
         border-color: blue;
     }
     button:hover {
