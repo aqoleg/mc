@@ -238,7 +238,9 @@
             read(event.target.files);
         };
 
-        document.getElementById('serials').ondragenter = function () {
+        document.getElementById('serials').ondragover = function (event) {
+            event.preventDefault();
+            event.stopPropagation();
             document.getElementById('serials').style.borderColor = 'blue';
         };
         document.getElementById('serials').ondragleave = function () {
@@ -246,6 +248,7 @@
         };
         document.getElementById('serials').ondrop = function (event) {
             event.preventDefault();
+            event.stopPropagation();
             document.getElementById('serials').style.borderColor = 'black';
             read(event.dataTransfer.files);
         };
