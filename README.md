@@ -14,7 +14,7 @@ Open the [app](https://aqoleg.github.io/mc/), select ropsten testnet and connect
 
 The app has different interfaces for operator and for any other account.
 
-[Watch](https://github.com/aqoleg/mc/blob/main/docs/index.html) or [download](https://github.com/aqoleg/mc/blob/main/docs/video.mp4) the demo video.
+[Watch](https://aqoleg.github.io/mc/docs/index.html) or [download](https://github.com/aqoleg/mc/raw/main/docs/video.mp4) the demo video.
 
 ## contacts
 
